@@ -45,7 +45,7 @@ class FocusTimerIndicator extends PanelMenu.Button {
     _buildMenu() {
         const cardItem = new PopupMenu.PopupBaseMenuItem({reactive: false, can_focus: false});
         cardItem.add_style_class_name('focus-card-item');
-        const card = new St.BoxLayout({vertical: true, x_expand: true, style_class: 'focus-card'});
+        const card = new St.BoxLayout({orientation: Clutter.Orientation.VERTICAL, x_expand: true, style_class: 'focus-card'});
 
         this._modeLabel = new St.Label({style_class: 'focus-mode-label', x_align: Clutter.ActorAlign.CENTER});
         this._timerLabel = new St.Label({style_class: 'focus-time-label', x_align: Clutter.ActorAlign.CENTER});

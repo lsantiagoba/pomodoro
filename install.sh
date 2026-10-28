@@ -6,8 +6,8 @@ SRC_DIR="src/v45-46-47-48-49-50"
 DEST="$HOME/.local/share/gnome-shell/extensions/$UUID"
 VERSION="$(gnome-shell --version | awk '{split($3,v,"."); print v[1]}')"
 
-if (( VERSION < 45 || VERSION > 50 )); then
-    echo "Focus Timer supports GNOME Shell 45 through 50 (detected $VERSION)."
+if (( VERSION < 45 || VERSION > 51 )); then
+    echo "Focus Timer supports GNOME Shell 45 through 51 (detected $VERSION)."
     exit 1
 fi
 

@@ -2,7 +2,7 @@
   "name": "Focus Timer",
   "description": "A polished Pomodoro timer for the GNOME Shell panel.",
   "uuid": "pomodoro@lsbcodes",
-  "shell-version": ["45", "46", "47", "48", "49", "50"],
+  "shell-version": ["45", "46", "47", "48", "49", "50", "51"],
   "settings-schema": "org.gnome.shell.extensions.pomodoro-lsantiagoba",
   "gettext-domain": "pomodoro@lsbcodes",
   "version": 1,
