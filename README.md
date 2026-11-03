@@ -8,6 +8,7 @@ A calm, native-looking Pomodoro timer for GNOME Shell 45–50.
 - Focus, short-break, and long-break cycles
 - Configurable durations and long-break interval
 - Optional automatic starts, notifications, and completion sound
+- Optional Do Not Disturb during focus sessions
 - Native GNOME/Libadwaita preferences
 - English plus Arabic, German, Spanish, French, Italian, Japanese, Korean,
   Portuguese, Russian, and Chinese translations
@@ -28,6 +29,11 @@ gnome-extensions enable pomodoro@lsbcodes
 ```
 
 Open **Timer Settings** from the panel menu to adjust the timer.
+
+Enable **Do Not Disturb during focus** under **Automation** to silence notifications
+while a focus timer is running. Pausing, resetting, skipping, finishing a session,
+or disabling the extension restores notifications if the timer silenced them.
+Do Not Disturb that was already enabled and manual changes are respected.
 
 ## Package
 
