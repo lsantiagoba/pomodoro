@@ -17,6 +17,13 @@ class FocusTimerIndicator extends PanelMenu.Button {
         super(0.0, _('Focus Timer'));
         this._extension = extension;
         this._settings = extension.getSettings();
+        this._notificationSettings = new Gio.Settings({schema_id: 'org.gnome.desktop.notifications'});
+        this._restoreBanners = null;
+        this._notificationSettingsChangedId = this._notificationSettings.connect('changed::show-banners', () => {
+            // Respect manual changes for the rest of this focus period.
+            if (this._restoreBanners !== null && this._notificationSettings.get_boolean('show-banners'))
+                this._restoreBanners = false;
+        });
         this._mode = Mode.FOCUS;
         this._running = false;
         this._sessions = 0;
@@ -25,8 +32,8 @@ class FocusTimerIndicator extends PanelMenu.Button {
 
         this._buildPanel();
         this._buildMenu();
-        this._settingsChangedId = this._settings.connect('changed', () => {
-            if (!this._running)
+        this._settingsChangedId = this._settings.connect('changed', (_settings, key) => {
+            if (!this._running && key !== 'do-not-disturb')
                 this._remaining = this._durationForMode();
             this._sync();
         });
@@ -140,6 +147,7 @@ class FocusTimerIndicator extends PanelMenu.Button {
         }
         this._remaining = this._durationForMode();
 
+        this._restoreNotifications();
         if (notify && this._settings.get_boolean('show-notifications')) {
             const title = completedMode === Mode.FOCUS ? _('Focus session complete') : _('Break complete');
             const body = completedMode === Mode.FOCUS ? _('Nice work. Time to recharge.') : _('Ready for another focused session?');
@@ -157,6 +165,7 @@ class FocusTimerIndicator extends PanelMenu.Button {
     }
 
     _sync() {
+        this._syncDoNotDisturb();
         const minutes = Math.floor(this._remaining / 60);
         const seconds = this._remaining % 60;
         const time = `${minutes}:${seconds.toString().padStart(2, '0')}`;
@@ -175,6 +184,24 @@ class FocusTimerIndicator extends PanelMenu.Button {
         this._startText.text = this._running ? _('Pause') : this._remaining === this._durationForMode() ? _('Start') : _('Resume');
     }
 
+    _syncDoNotDisturb() {
+        if (this._running && this._mode === Mode.FOCUS && this._settings.get_boolean('do-not-disturb')) {
+            if (this._restoreBanners === null) {
+                this._restoreBanners = this._notificationSettings.get_boolean('show-banners');
+                if (this._restoreBanners)
+                    this._restoreBanners = this._notificationSettings.set_boolean('show-banners', false);
+            }
+        } else {
+            this._restoreNotifications();
+        }
+    }
+
+    _restoreNotifications() {
+        if (this._restoreBanners)
+            this._notificationSettings.set_boolean('show-banners', true);
+        this._restoreBanners = null;
+    }
+
     _stopTimeout() {
         if (this._timeoutId) {
             GLib.source_remove(this._timeoutId);
@@ -184,6 +211,9 @@ class FocusTimerIndicator extends PanelMenu.Button {
 
     destroy() {
         this._stopTimeout();
+        this._notificationSettings.disconnect(this._notificationSettingsChangedId);
+        this._restoreNotifications();
+        this._notificationSettings = null;
         if (this._settingsChangedId)
             this._settings.disconnect(this._settingsChangedId);
         this._settings = null;

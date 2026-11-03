@@ -30,6 +30,7 @@ export default class PomodoroPreferences extends ExtensionPreferences {
         timerPage.add(flowGroup);
         this._addSwitchRow(flowGroup, settings, 'auto-start-breaks', _('Start breaks automatically'), _('Begin the next break without waiting'));
         this._addSwitchRow(flowGroup, settings, 'auto-start-focus', _('Start focus automatically'), _('Begin the next session after a break'));
+        this._addSwitchRow(flowGroup, settings, 'do-not-disturb', _('Do Not Disturb during focus'), _('Restore the previous notification setting when the timer stops'));
 
         const feedbackGroup = new Adw.PreferencesGroup({title: _('Feedback')});
         timerPage.add(feedbackGroup);
