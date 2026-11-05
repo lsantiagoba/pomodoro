@@ -21,6 +21,7 @@ class FocusTimerIndicator extends PanelMenu.Button {
         this._running = false;
         this._sessions = 0;
         this._timeoutId = 0;
+        this._deadline = 0;
         this._remaining = this._durationForMode();
 
         this._buildPanel();
@@ -47,11 +48,17 @@ class FocusTimerIndicator extends PanelMenu.Button {
         cardItem.add_style_class_name('focus-card-item');
         const card = new St.BoxLayout({vertical: true, x_expand: true, style_class: 'focus-card'});
 
-        this._modeLabel = new St.Label({style_class: 'focus-mode-label', x_align: Clutter.ActorAlign.CENTER});
-        this._timerLabel = new St.Label({style_class: 'focus-time-label', x_align: Clutter.ActorAlign.CENTER});
+        this._modeLabel = new St.Label({style_class: 'focus-mode-label', x_expand: true});
+        this._timerLabel = new St.Label({style_class: 'focus-time-label', x_expand: true});
         this._sessionLabel = new St.Label({style_class: 'focus-session-label', x_align: Clutter.ActorAlign.CENTER});
+        const timer = new St.BoxLayout({style_class: 'focus-timer', x_expand: true});
+        this._decreaseButton = this._iconButton('list-remove-symbolic', _('Remove 5 minutes'));
+        this._increaseButton = this._iconButton('list-add-symbolic', _('Add 5 minutes'));
+        timer.add_child(this._decreaseButton);
+        timer.add_child(this._timerLabel);
+        timer.add_child(this._increaseButton);
         card.add_child(this._modeLabel);
-        card.add_child(this._timerLabel);
+        card.add_child(timer);
         card.add_child(this._sessionLabel);
 
         const controls = new St.BoxLayout({style_class: 'focus-controls', x_align: Clutter.ActorAlign.CENTER});
@@ -74,6 +81,8 @@ class FocusTimerIndicator extends PanelMenu.Button {
         this._startButton.connect('clicked', () => this._toggle());
         this._resetButton.connect('clicked', () => this._reset());
         this._skipButton.connect('clicked', () => this._complete(false));
+        this._decreaseButton.connect('clicked', () => this._adjustTime(-5));
+        this._increaseButton.connect('clicked', () => this._adjustTime(5));
 
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
         const preferences = new PopupMenu.PopupMenuItem(_('Timer Settings'));
@@ -87,6 +96,7 @@ class FocusTimerIndicator extends PanelMenu.Button {
             child: new St.Icon({icon_name: iconName}),
             style_class: 'focus-icon-button',
             can_focus: true,
+            y_align: Clutter.ActorAlign.CENTER,
             accessible_name: accessibleName,
         });
     }
@@ -95,6 +105,14 @@ class FocusTimerIndicator extends PanelMenu.Button {
         const key = this._mode === Mode.FOCUS ? 'focus-duration' :
             this._mode === Mode.SHORT_BREAK ? 'short-break-duration' : 'long-break-duration';
         return this._settings.get_int(key) * 60;
+    }
+
+    _adjustTime(minutes) {
+        const remaining = this._remaining + minutes * 60;
+        if (this._running || remaining <= 0)
+            return;
+        this._remaining = remaining;
+        this._sync();
     }
 
     _toggle() {
@@ -122,6 +140,7 @@ class FocusTimerIndicator extends PanelMenu.Button {
 
     _reset() {
         this._running = false;
+        this._deadline = 0;
         this._stopTimeout();
         this._remaining = this._durationForMode();
         this._sync();
@@ -130,6 +149,7 @@ class FocusTimerIndicator extends PanelMenu.Button {
     _complete(notify) {
         const completedMode = this._mode;
         this._running = false;
+        this._deadline = 0;
         this._stopTimeout();
         if (completedMode === Mode.FOCUS) {
             this._sessions++;
@@ -172,7 +192,12 @@ class FocusTimerIndicator extends PanelMenu.Button {
         this._panelLabel.text = this._running ? time : _('Focus');
         this._panelIcon.icon_name = this._mode === Mode.FOCUS ? 'alarm-symbolic' : 'weather-clear-night-symbolic';
         this._startIcon.icon_name = this._running ? 'media-playback-pause-symbolic' : 'media-playback-start-symbolic';
-        this._startText.text = this._running ? _('Pause') : this._remaining === this._durationForMode() ? _('Start') : _('Resume');
+        this._startText.text = this._running ? _('Pause') : this._deadline ? _('Resume') : _('Start');
+        this._decreaseButton.visible = !this._running;
+        this._increaseButton.visible = !this._running;
+        this._decreaseButton.reactive = this._remaining > 5 * 60;
+        this._decreaseButton.can_focus = this._decreaseButton.reactive;
+        this._decreaseButton.opacity = this._decreaseButton.reactive ? 255 : 100;
     }
 
     _stopTimeout() {

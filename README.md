@@ -5,6 +5,7 @@ A calm, native-looking Pomodoro timer for GNOME Shell 45–50.
 ## Features
 
 - Start, pause, resume, reset, and skip from the panel
+- Add or remove five minutes from the current timer while stopped or paused
 - Focus, short-break, and long-break cycles
 - Configurable durations and long-break interval
 - Optional automatic starts, notifications, and completion sound

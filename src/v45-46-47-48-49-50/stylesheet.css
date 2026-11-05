@@ -1,7 +1,9 @@
 .focus-card-item { padding: 0 !important; }
 .focus-card { min-width: 320px; padding: 22px 20px 20px; spacing: 6px; }
-.focus-mode-label { color: rgba(255,255,255,.62); font-size: .82em; font-weight: 700; letter-spacing: 1px; }
-.focus-time-label { font-size: 3.4em; font-weight: 300; font-feature-settings: "tnum"; padding: 2px 0; }
+.focus-mode-label { color: rgba(255,255,255,.62); font-size: .82em; font-weight: 700; letter-spacing: 1px; text-align: center; }
+.focus-timer { spacing: 12px; }
+.focus-timer .focus-icon-button StIcon { icon-size: 16px; }
+.focus-time-label { font-size: 3.4em; font-weight: 300; font-feature-settings: "tnum"; padding: 2px 0; text-align: center; }
 .focus-session-label { color: rgba(255,255,255,.62); font-size: .9em; padding-bottom: 14px; }
 .focus-controls { spacing: 12px; }
 .focus-icon-button { border-radius: 99px; padding: 12px; background-color: rgba(255,255,255,.09); }
